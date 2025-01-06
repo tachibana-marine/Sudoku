@@ -4,7 +4,7 @@
 
     "godotTools.editorPath.godot4": "/Godot/Godot_v4.3-stable_linux.x86_64",
     
-    "gut-extension.additionalOptions": "-d",
+    "gut-extension.additionalOptions": "-d --headless",
 
     "godotFormatterAndLinter.indentSpacesSize": 2,
     "godotFormatterAndLinter.indentType": "Spaces",
