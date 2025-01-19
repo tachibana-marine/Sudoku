@@ -66,6 +66,92 @@ func test_sudoku_resets_color_on_click_cell():
   assert_eq(cells[4].color, Sudoku.SELECTED_CELL_COLOR)
 
 
+func test_verify_sudoku_cells_have_1_to_9():
+  var cells: Array[Cell] = []
+  cells.resize(9)
+  for i in range(9):
+    var cell = autofree(Cell.new())
+    cell.number = i + 1  # 1 to 9
+    cells[i] = cell
+  assert_true(Sudoku.verify_cells(cells))
+
+
+func test_verify_sudoku_cells_have_0():
+  var cells: Array[Cell] = []
+  cells.resize(9)
+  for i in range(9):
+    var cell = autofree(Cell.new())
+    cell.number = i  # 0 to 8
+    cells[i] = cell
+  assert_false(Sudoku.verify_cells(cells))
+
+
+func test_get_box_cells():
+  var sudoku = autofree(Sudoku.new())
+  var cells = sudoku.get_cells()
+  var expected_cells = [
+    cells[3],
+    cells[4],
+    cells[5],
+    cells[12],
+    cells[13],
+    cells[14],
+    cells[21],
+    cells[22],
+    cells[23],
+  ]
+  var box_cells = sudoku.get_cells_in_box(1)
+  assert_eq(expected_cells, box_cells)
+
+
+func test_get_row_cells():
+  var sudoku = autofree(Sudoku.new())
+  var cells = sudoku.get_cells()
+  var expected_cells = [
+    cells[9],
+    cells[10],
+    cells[11],
+    cells[12],
+    cells[13],
+    cells[14],
+    cells[15],
+    cells[16],
+    cells[17],
+  ]
+  var box_cells = sudoku.get_cells_in_row(1)
+  assert_eq(expected_cells, box_cells)
+
+
+func test_fill_the_first_box():
+  var sudoku = autofree(Sudoku.new())
+  sudoku.fill_first_box()
+  var cells = sudoku.get_cells_in_box(0)
+  assert_true(Sudoku.verify_cells(cells))
+
+
+func test_fill_the__first_row():
+  var sudoku = autofree(Sudoku.new())
+  sudoku.fill_first_row()
+  var cells = sudoku.get_cells_in_row(0)
+  assert_true(Sudoku.verify_cells(cells))
+
+
+# func test_sudoku_creates_complete_sudoku_grid():
+#   var sudoku = autofree(Sudoku.new())
+#   sudoku.populate_grid()
+#   var rows = sudoku.get_rows()
+#   var columns = sudoku.get_columns()
+#   var boxes = sudoku.get_boxes()
+
+#   assert_eq(rows.size(), 9)
+#   assert_eq(columns.size(), 9)
+#   assert_eq(boxes.size(), 9)
+
+#   assert_true(rows.all(check_if_sudoku_cells_contains_1_to_9))
+#   assert_true(columns.all(check_if_sudoku_cells_contains_1_to_9))
+#   assert_true(boxes.all(check_if_sudoku_cells_contains_1_to_9))
+
+
 class TestSudokuInput:
   extends GutTest
 
@@ -82,9 +168,13 @@ class TestSudokuInput:
     if DisplayServer.get_name() == "headless":
       return "Skip Input tests when running headless"
 
-  func test_click_to_selects_cell():
+  func test_select_and_change_number_of_a_cell():
     var sudoku = add_child_autofree(Sudoku.new())
     var cells = sudoku.get_cells()
     _sender.mouse_left_button_down(Vector2.ZERO).hold_for(.2)
     await (_sender.idle)
     assert_eq(sudoku.selected_cell, cells[0])
+
+    _sender.key_down(KEY_7).hold_for(.2)
+    await (_sender.idle)
+    assert_eq(sudoku.selected_cell.number, 7)
