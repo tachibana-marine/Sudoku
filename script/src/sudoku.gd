@@ -32,10 +32,25 @@ static func verify_cells(cells: Array[Cell]):
   count.resize(9)
   count.fill(0)
   for cell in cells:
-    if cell.number < 1 or cell.number > 9:
+    if cell.number == 0:
       return false
     count[cell.number - 1] = 1
   if count.all(func(num): return num == 1):
+    return true
+  return false
+
+
+# verify there is no duplicate cells (cells with number=0 are not counted)
+static func verify_no_duplicate_cells(cells: Array[Cell]):
+  var count = []
+  count.resize(9)
+  count.fill(0)
+  for cell in cells:
+    if cell.number == 0:
+      continue
+    count[cell.number - 1] += 1
+  print(count)
+  if count.all(func(num): return num <= 1):
     return true
   return false
 
@@ -73,6 +88,7 @@ func get_cells_in_row(index: int) -> Array[Cell]:
   return cells_in_row
 
 
+# fill the first box with 1 to 9 in order.
 func fill_first_box():
   var cells_in_first_box = get_cells_in_box(0)
   var index = 1
@@ -81,11 +97,64 @@ func fill_first_box():
     index += 1
 
 
-func fill_first_row():
+# fill the first row of the second and the third box randomly
+func fill_first_row_of_second_and_third_box():
+  var int_pool = [4, 5, 6, 7, 8, 9]
   var cells_in_first_row = get_cells_in_row(0)
-  var index = 1
+  var index = 0
   for cell in cells_in_first_row:
-    cell.number = index
+    index += 1
+    if index < 4:
+      continue
+    var num = int_pool.pick_random()
+    cell.number = num
+    int_pool.erase(num)
+
+
+# Fill the second row of the second and third box randomly
+# The two methods above should be called beforehand.
+func fill_second_row_of_second_and_third_box():
+  var int_pool = [1, 2, 3, 7, 8, 9]
+  var cells_in_second_box = get_cells_in_box(1)
+  var cells_in_third_box = get_cells_in_box(2)
+
+  var int_pool_second_box = []
+  var int_pool_third_box = []
+
+  for i in range(3):
+    var num = cells_in_second_box[i].number
+    if num in int_pool:
+      int_pool.erase(num)
+      int_pool_third_box.append(num)
+
+  for i in range(3):
+    var num = cells_in_third_box[i].number
+    if num in int_pool:
+      int_pool.erase(num)
+      int_pool_second_box.append(num)
+
+  while int_pool_second_box.size() < 3:
+    var num = int_pool.pick_random()
+    int_pool.erase(num)
+    int_pool_second_box.append(num)
+  int_pool_third_box.append_array(int_pool)
+
+  var cells_in_second_row = get_cells_in_row(1)
+  var index = 0
+  for cell in cells_in_second_row:
+    if index < 3:
+      index += 1
+      continue
+    if index < 6:
+      var num = int_pool_second_box.pick_random()
+      print(int_pool_second_box)
+      cell.number = num
+      int_pool_second_box.erase(num)
+    else:
+      var num = int_pool_third_box.pick_random()
+      print(int_pool_third_box)
+      cell.number = num
+      int_pool_third_box.erase(num)
     index += 1
 
 
@@ -133,7 +202,7 @@ func _init() -> void:
       _cells.append(cell)
       _adjust_cell_properties(j, i)
       cell.border_width = 3
-      cell.number = 1
+      cell.number = 0
       cell.font_size = CELL_FONT_SIZE
       cell.color = DEFAULT_CELL_COLOR
       cell.on_click.connect(_on_click_cell)
@@ -147,4 +216,5 @@ func _init() -> void:
       _adjust_box_properties(j, i)
 
   fill_first_box()
-  fill_first_row()
+  fill_first_row_of_second_and_third_box()
+  fill_second_row_of_second_and_third_box()
