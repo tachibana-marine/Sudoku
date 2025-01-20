@@ -88,6 +88,99 @@ func get_cells_in_row(index: int) -> Array[Cell]:
   return cells_in_row
 
 
+# fill the whole grid (in the future)
+func fill_grid():
+  _fill_the_first_row()
+  _fill_the_second_row()
+  _fill_the_third_row()
+
+
+# fill the first row randomly with 1 to 9
+func _fill_the_first_row():
+  var int_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  var cells_in_first_row = get_cells_in_row(0)
+  for i in range(9):
+    var num = int_pool.pick_random()
+    cells_in_first_row[i].number = num
+    int_pool.erase(num)
+
+
+# get first three numbers of an array
+func _get_first_some_cells_num(cells: Array[Cell], num = 3):
+  var first_three_nums = []
+  for i in range(num):
+    first_three_nums.append(cells[i].number)
+  return first_three_nums
+
+
+# remove numbers in array2 from array1
+func _subtract_array(array1: Array, array2: Array) -> Array:
+  var array1_copy = array1.duplicate()
+  for num in array2:
+    if num in array1_copy:
+      array1_copy.erase(num)
+  return array1_copy
+
+
+# pop three numbers from an array
+func _pop_three_random_numbers(numbers: Array):
+  var three_numbers = []
+  for i in range(3):
+    var num = numbers.pick_random()
+    numbers.erase(num)
+    three_numbers.append(num)
+  return three_numbers
+
+
+# fill the second row randomly with 1 to 9
+func _fill_the_second_row():
+  var int_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  var int_pools = []
+
+  var first_box = _get_first_some_cells_num(get_cells_in_box(0))
+  var second_box = _get_first_some_cells_num(get_cells_in_box(1))
+
+  int_pools.append(_pop_three_random_numbers(_subtract_array(int_pool, first_box)))
+
+  var tmp = int_pools[0].duplicate()
+  tmp.append_array(second_box)
+  print(tmp)
+  int_pools.append(_pop_three_random_numbers(_subtract_array(int_pool, tmp)))
+
+  tmp = int_pools[0].duplicate()
+  tmp.append_array(int_pools[1])
+  int_pools.append(_subtract_array(int_pool, tmp))
+
+  var cells_in_second_row = get_cells_in_row(1)
+  for j in range(3):
+    for i in range(3):
+      var num = int_pools[j].pick_random()
+      print(int_pools[j])
+      cells_in_second_row[j * 3 + i].number = num
+      int_pools[j].erase(num)
+
+
+func _fill_the_third_row():
+  var int_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  var int_pools = []
+
+  var first_box = _get_first_some_cells_num(get_cells_in_box(0), 6)
+  var second_box = _get_first_some_cells_num(get_cells_in_box(1), 6)
+  var third_box = _get_first_some_cells_num(get_cells_in_box(2), 6)
+
+  int_pools.append(_subtract_array(int_pool, first_box))
+  int_pools.append(_subtract_array(int_pool, second_box))
+  int_pools.append(_subtract_array(int_pool, third_box))
+
+  var cells_in_third_row = get_cells_in_row(2)
+  for j in range(3):
+    for i in range(3):
+      var num = int_pools[j].pick_random()
+      print(int_pools[j])
+      cells_in_third_row[j * 3 + i].number = num
+      int_pools[j].erase(num)
+
+
 # fill the first box with 1 to 9 in order.
 func fill_first_box():
   var cells_in_first_box = get_cells_in_box(0)
@@ -215,6 +308,4 @@ func _init() -> void:
       _boxes.append(box_border)
       _adjust_box_properties(j, i)
 
-  fill_first_box()
-  fill_first_row_of_second_and_third_box()
-  fill_second_row_of_second_and_third_box()
+  fill_grid()

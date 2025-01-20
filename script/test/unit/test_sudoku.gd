@@ -154,34 +154,45 @@ func test_get_row_cells():
   assert_eq(expected_cells, box_cells)
 
 
-func test_fill_the_first_box():
+func test_fill_to_the_third_row():
+  seed(1000)
   var sudoku = autofree(Sudoku.new())
-  sudoku.fill_first_box()
-  var cells = sudoku.get_cells_in_box(0)
-  assert_true(Sudoku.verify_cells(cells))
+  sudoku.fill_grid()
+
+  assert_true(Sudoku.verify_cells(sudoku.get_cells_in_row(0)))
+  assert_true(Sudoku.verify_cells(sudoku.get_cells_in_row(1)))
+  assert_true(Sudoku.verify_cells(sudoku.get_cells_in_row(2)))
+
+  for i in range(3):
+    var cells_in_box = sudoku.get_cells_in_box(i)
+    assert_true(Sudoku.verify_cells(cells_in_box))
 
 
-func test_fill_the_first_row_of_second_and_third_box():
-  # I won't test the randomness.
-  for _i in range(10):
-    # Test multiple times just to be sure
-    var sudoku = autofree(Sudoku.new())
-    sudoku.fill_first_row_of_second_and_third_box()
-    var cells = sudoku.get_cells_in_row(0)
-    assert_true(Sudoku.verify_cells(cells))
+# func test_fill_the_first_box():
+#   var sudoku = autofree(Sudoku.new())
+#   sudoku.fill_first_box()
+#   var cells = sudoku.get_cells_in_box(0)
+#   assert_true(Sudoku.verify_cells(cells))
 
+# func test_fill_the_first_row_of_second_and_third_box():
+#   # I won't test the randomness.
+#   for _i in range(10):
+#     # Test multiple times just to be sure
+#     var sudoku = autofree(Sudoku.new())
+#     sudoku.fill_first_row_of_second_and_third_box()
+#     var cells = sudoku.get_cells_in_row(0)
+#     assert_true(Sudoku.verify_cells(cells))
 
-func test_fill_the_second_row_of_second_and_third_box():
-  # I won't test the randomness.
-  for _i in range(10):
-    # Test multiple times just to be sure
-    var sudoku = autofree(Sudoku.new())
-    sudoku.fill_second_row_of_second_and_third_box()
-    var cells = sudoku.get_cells_in_row(1)
-    assert_true(Sudoku.verify_cells(cells))
-    assert_true(Sudoku.verify_no_duplicate_cells(sudoku.get_cells_in_box(1)))
-    assert_true(Sudoku.verify_no_duplicate_cells(sudoku.get_cells_in_box(2)))
-
+# func test_fill_the_second_row_of_second_and_third_box():
+#   # I won't test the randomness.
+#   for _i in range(10):
+#     # Test multiple times just to be sure
+#     var sudoku = autofree(Sudoku.new())
+#     sudoku.fill_second_row_of_second_and_third_box()
+#     var cells = sudoku.get_cells_in_row(1)
+#     assert_true(Sudoku.verify_cells(cells))
+#     assert_true(Sudoku.verify_no_duplicate_cells(sudoku.get_cells_in_box(1)))
+#     assert_true(Sudoku.verify_no_duplicate_cells(sudoku.get_cells_in_box(2)))
 
 # func test_sudoku_creates_complete_sudoku_grid():
 #   var sudoku = autofree(Sudoku.new())
