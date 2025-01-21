@@ -136,6 +136,24 @@ func test_get_box_cells():
   assert_eq(expected_cells, box_cells)
 
 
+func test_get_column_cells():
+  var sudoku = autofree(Sudoku.new())
+  var cells = sudoku.get_cells()
+  var expected_cells = [
+    cells[1],
+    cells[10],
+    cells[19],
+    cells[28],
+    cells[37],
+    cells[46],
+    cells[55],
+    cells[64],
+    cells[73],
+  ]
+  var column_cells = sudoku.get_cells_in_column(1)
+  assert_eq(expected_cells, column_cells)
+
+
 func test_get_row_cells():
   var sudoku = autofree(Sudoku.new())
   var cells = sudoku.get_cells()
@@ -154,9 +172,9 @@ func test_get_row_cells():
   assert_eq(expected_cells, box_cells)
 
 
-func test_fill_to_the_third_row():
-  seed(1000)
+func test_fill_first_three_rows():
   var sudoku = autofree(Sudoku.new())
+  sudoku.set_state(1000)
   sudoku.fill_grid()
 
   assert_true(Sudoku.verify_cells(sudoku.get_cells_in_row(0)))
