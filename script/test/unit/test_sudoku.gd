@@ -174,16 +174,20 @@ func test_get_row_cells():
 
 func test_fill_first_three_rows():
   var sudoku = autofree(Sudoku.new())
-  sudoku.set_state(1000)
+  sudoku.set_state(5132284688566544283)
   sudoku.fill_grid()
 
-  assert_true(Sudoku.verify_cells(sudoku.get_cells_in_row(0)))
-  assert_true(Sudoku.verify_cells(sudoku.get_cells_in_row(1)))
-  assert_true(Sudoku.verify_cells(sudoku.get_cells_in_row(2)))
+  for i in range(3):
+    var cells_in_row = sudoku.get_cells_in_box(i)
+    assert_true(Sudoku.verify_cells(cells_in_row))
 
   for i in range(3):
     var cells_in_box = sudoku.get_cells_in_box(i)
     assert_true(Sudoku.verify_cells(cells_in_box))
+
+  for i in range(9):
+    var cells_in_column = sudoku.get_cells_in_column(i)
+    assert_true(Sudoku.verify_no_duplicate_cells(cells_in_column))
 
 
 # func test_fill_the_first_box():

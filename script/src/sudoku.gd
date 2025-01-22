@@ -105,13 +105,14 @@ func get_cells_in_column(index: int) -> Array[Cell]:
 # fill the whole grid (in the future)
 func fill_grid():
   print("fill_grid state: ", _random.state)
-  _fill_first_box()
-  _fill_first_row_of_second_and_third_box()
-  _fill_second_row_of_second_and_third_box()
-  _fill_third_row_of_second_and_third_box()
-  _print_row(0)
-  _print_row(1)
-  _print_row(2)
+  for j in range(4):
+    var cells = get_cells_in_row(j)
+    for i in range(9):
+      var num = _find_num(i, j)
+      cells[i].number = num
+
+    for k in range(5):
+      _print_row(k)
 
 
 # print row
@@ -160,100 +161,30 @@ func _get_numbers_from_cells(cells: Array[Cell]) -> Array[int]:
   return nums
 
 
-# fill a cell with random, but correct number
-# Too tedious to write the algorithm
-# func _fill_a_cell(x: int, y: int) -> void:
-#   var box_index = int(x / 3.0) + int(y / 3.0) * 3
-#   var row_cells = get_cells_in_row(y)
-#   var column_cells = get_cells_in_column(x)
-#   var box_cells = get_cells_in_box(box_index)
-
-#   var int_pool = []
-#   var exclude_nums = []
-#   exclude_nums.append_array(_get_numbers_from_cells(row_cells))
-#   exclude_nums.append_array(_get_numbers_from_cells(column_cells))
-#   exclude_nums.append_array(_get_numbers_from_cells(box_cells))
-
-#   int_pool = _subtract_array(int_pool, exclude_nums)
-#   print(int_pool)
-#   _cells[x + y * 9].number = int_pool[_random.randi_range(0, int_pool.size() - 1)]
-#   print(_cells[x + y * 9].number)
-
-
-# fill the first box with 1 to 9 in order.
-func _fill_first_box():
-  var cells_in_first_box = get_cells_in_box(0)
-  var index = 1
-  for cell in cells_in_first_box:
-    cell.number = index
-    index += 1
-
-
-# fill the first row of the second and the third box randomly
-func _fill_first_row_of_second_and_third_box():
-  var int_pool = [4, 5, 6, 7, 8, 9]
-  var cells_in_first_row = get_cells_in_row(0)
-  var index = 0
-  for cell in cells_in_first_row:
-    index += 1
-    if index < 4:
-      continue
-    var num = _pop_some_random_numbers(int_pool, 1)[0]
-    cell.number = num
-
-
-# Fill the second row of the second and third box randomly
-func _fill_second_row_of_second_and_third_box():
-  var int_pool = [1, 2, 3, 7, 8, 9]
-  var nums_in_second_box = _get_numbers_from_cells(get_cells_in_box(1))
-  var nums_in_third_box = _get_numbers_from_cells(get_cells_in_box(2))
-
-  var int_pool_second_box = []
-  var int_pool_third_box = []
-
-  # add numbers which must be in the second box =
-  # numbers in the third box except for the ones which aare already in the first box
-  int_pool_second_box = _subtract_array(nums_in_third_box, [4, 5, 6])
-  var tmp = _subtract_array(int_pool, nums_in_second_box)
-  tmp = _subtract_array(tmp, int_pool_second_box)
-  int_pool_second_box.append(_pop_some_random_numbers(tmp, 1)[0])
-  print(int_pool_second_box)
-  int_pool_third_box = _subtract_array(int_pool, int_pool_second_box)
-
-  int_pool = []
-  for i in range(3):
-    int_pool.append(_pop_some_random_numbers(int_pool_second_box, 1)[0])
-  for i in range(3):
-    int_pool.append(_pop_some_random_numbers(int_pool_third_box, 1)[0])
-
-  var index = 3
-  var cells_in_second_row = get_cells_in_row(1)
-  for i in range(6):
-    cells_in_second_row[index + i].number = int_pool[i]
-
-
-# Fill the third row of the second and third box randomly
-func _fill_third_row_of_second_and_third_box():
+# find valid num of the given coord
+# assuming the grid with filled from top-left to bottom-right
+func _find_num(x: int, y: int):
+  # numbers can be in there
   var int_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-  var nums_in_second_box = _get_numbers_from_cells(get_cells_in_box(1))
-  var nums_in_third_box = _get_numbers_from_cells(get_cells_in_box(2))
+  var box = int(x / 3.0) + int(y / 3.0) * 3
+  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_box(box)))
+  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_column(x)))
+  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_row(y)))
 
-  var int_pool_second_box = []
-  var int_pool_third_box = []
+  # numbers must be in there
+  var includes = []
 
-  int_pool_second_box = _subtract_array(int_pool, nums_in_second_box)
-  int_pool_third_box = _subtract_array(int_pool, nums_in_third_box)
+  if box % 3 == 1:
+    var nums_in_same_row = _get_numbers_from_cells(get_cells_in_row(y))
+    var nums_in_next_box = _get_numbers_from_cells(get_cells_in_box(box + 1))
+    includes = _subtract_array(nums_in_next_box, nums_in_same_row)
 
-  int_pool = []
-  for i in range(3):
-    int_pool.append(_pop_some_random_numbers(int_pool_second_box, 1)[0])
-  for i in range(3):
-    int_pool.append(_pop_some_random_numbers(int_pool_third_box, 1)[0])
+  # FIXME: fishy
+  if not includes.is_empty():
+    int_pool = includes
 
-  var index = 3
-  var cells_in_third_row = get_cells_in_row(2)
-  for i in range(6):
-    cells_in_third_row[index + i].number = int_pool[i]
+  print(int_pool)
+  return _pop_some_random_numbers(int_pool, 1)[0]
 
 
 func _adjust_cell_properties(x, y):
