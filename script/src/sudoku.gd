@@ -105,14 +105,57 @@ func get_cells_in_column(index: int) -> Array[Cell]:
 # fill the whole grid (in the future)
 func fill_grid():
   print("fill_grid state: ", _random.state)
-  for j in range(4):
-    var cells = get_cells_in_row(j)
-    for i in range(9):
-      var num = _find_num(i, j)
-      cells[i].number = num
+  var i = 0
+  while i < 81:
+    var x = i % 9
+    var y = int(i / 9.0)
+    var num = _find_num(x, y)
+    if num == 0:
+      # reset to the start
+      for k in range(i):
+        _cells[i - k - 1].number = 0
+      i = 0
+      continue
+    _cells[i].number = num
+    i += 1
+    if i >= 9 * 9:
+      # early break for now
+      break
+  for k in range(9):
+    _print_row(k)
 
-    for k in range(5):
-      _print_row(k)
+
+# Randomly reset <num> cells to zero
+func randomly_reset_cells(num: int):
+  print("randomly_reset_cells state: ", _random.state)
+  if num > 81:
+    return
+  var remove_pos = []
+  for i in range(num):
+    while true:
+      var pos = _random.randi_range(0, 80)
+      if pos not in remove_pos:
+        remove_pos.append(pos)
+        break
+  print(remove_pos)
+  for pos in remove_pos:
+    _cells[pos].number = 0
+
+
+# find valid num of the given coord
+# assuming the grid is filled from top-left to bottom-right
+func _find_num(x: int, y: int):
+  # numbers can be in there
+  var int_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+  var box = int(x / 3.0) + int(y / 3.0) * 3
+  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_box(box)))
+  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_column(x)))
+  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_row(y)))
+
+  if int_pool.size() == 0:
+    return 0
+  var num = _pop_some_random_numbers(int_pool, 1)[0]
+  return num
 
 
 # print row
@@ -161,32 +204,6 @@ func _get_numbers_from_cells(cells: Array[Cell]) -> Array[int]:
   return nums
 
 
-# find valid num of the given coord
-# assuming the grid with filled from top-left to bottom-right
-func _find_num(x: int, y: int):
-  # numbers can be in there
-  var int_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-  var box = int(x / 3.0) + int(y / 3.0) * 3
-  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_box(box)))
-  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_column(x)))
-  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_row(y)))
-
-  # numbers must be in there
-  var includes = []
-
-  if box % 3 == 1:
-    var nums_in_same_row = _get_numbers_from_cells(get_cells_in_row(y))
-    var nums_in_next_box = _get_numbers_from_cells(get_cells_in_box(box + 1))
-    includes = _subtract_array(nums_in_next_box, nums_in_same_row)
-
-  # FIXME: fishy
-  if not includes.is_empty():
-    int_pool = includes
-
-  print(int_pool)
-  return _pop_some_random_numbers(int_pool, 1)[0]
-
-
 func _adjust_cell_properties(x, y):
   var cell = _cells[y * 9 + x]
   cell.size = cell_size
@@ -210,7 +227,7 @@ func _input(event: InputEvent) -> void:
   if event is InputEventKey:
     if event.is_pressed:
       var number = int(OS.get_keycode_string(event.keycode))
-      if selected_cell and number > 0:
+      if selected_cell and number >= 0:
         selected_cell.number = number
 
 

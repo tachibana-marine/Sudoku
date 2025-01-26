@@ -174,20 +174,49 @@ func test_get_row_cells():
 
 func test_fill_first_three_rows():
   var sudoku = autofree(Sudoku.new())
-  sudoku.set_state(5132284688566544283)
+  sudoku.set_state(894789547401239051)
   sudoku.fill_grid()
 
-  for i in range(3):
-    var cells_in_row = sudoku.get_cells_in_box(i)
+  for i in range(9):
+    var cells_in_row = sudoku.get_cells_in_row(i)
     assert_true(Sudoku.verify_cells(cells_in_row))
 
-  for i in range(3):
+  for i in range(9):
     var cells_in_box = sudoku.get_cells_in_box(i)
     assert_true(Sudoku.verify_cells(cells_in_box))
 
   for i in range(9):
     var cells_in_column = sudoku.get_cells_in_column(i)
-    assert_true(Sudoku.verify_no_duplicate_cells(cells_in_column))
+    assert_true(Sudoku.verify_cells(cells_in_column))
+
+
+func test_randomly_reset_cells():
+  var sudoku = autofree(Sudoku.new())
+  sudoku.set_state(100)
+  sudoku.fill_grid()
+  sudoku.set_state(1000)
+  sudoku.randomly_reset_cells(50)
+  var cells = sudoku.get_cells()
+  var zero_count = 0
+  for cell in cells:
+    if cell.number == 0:
+      zero_count += 1
+  assert_eq(50, zero_count)
+
+
+func test_cannot_reset_cells_more_than_81():
+  var sudoku = autofree(Sudoku.new())
+  sudoku.set_state(100)
+  sudoku.fill_grid()
+  sudoku.set_state(1000)
+  sudoku.randomly_reset_cells(82)
+  var cells = sudoku.get_cells()
+  var zero_count = 0
+  for cell in cells:
+    if cell.number == 0:
+      zero_count += 1
+  # nothing happens
+  assert_eq(0, zero_count)
 
 
 # func test_fill_the_first_box():
