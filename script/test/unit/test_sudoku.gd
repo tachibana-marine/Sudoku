@@ -1,5 +1,7 @@
 extends GutTest
 
+var _cell_scene = load("res://scene/cell.tscn")
+
 
 func test_sudoku_has_9x9_cells():
   var sudoku = autofree(Sudoku.new())
@@ -69,7 +71,7 @@ func test_verify_sudoku_cells_have_1_to_9():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(Cell.new())
+    var cell = autofree(_cell_scene.instantiate())
     cell.number = i + 1  # 1 to 9
     cells[i] = cell
   assert_true(Sudoku.verify_cells(cells))
@@ -79,7 +81,7 @@ func test_verify_sudoku_cells_have_0():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(Cell.new())
+    var cell = autofree(_cell_scene.instantiate())
     cell.number = i  # 0 to 8
     cells[i] = cell
   assert_false(Sudoku.verify_cells(cells))
@@ -89,7 +91,7 @@ func test_verify_no_duplicate_cells():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(Cell.new())
+    var cell = autofree(_cell_scene.instantiate())
     cell.number = i + 1  # 1 to 9
     cells[i] = cell
   assert_true(Sudoku.verify_cells(cells))
@@ -99,7 +101,7 @@ func test_verify_duplicate_cells_exist():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(Cell.new())
+    var cell = autofree(_cell_scene.instantiate())
     cell.number = i + 1  # 1 to 9
     cells[i] = cell
   cells[8].number = 7  # set a duplicate number
@@ -110,7 +112,7 @@ func test_verify_duplicate_zeros_are_not_counted():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(Cell.new())
+    var cell = autofree(_cell_scene.instantiate())
     cell.number = i + 1  # 1 to 9
     cells[i] = cell
   cells[7].number = 0

@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://beuaurn7vlwen"]
+
+[ext_resource type="Script" path="res://script/src/cell.gd" id="1_aivey"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ge4qc"]
+size = Vector2(50, 50)
+
+[node name="Cell" type="Area2D"]
+script = ExtResource("1_aivey")
+size = 40
+number = 2
+
+[node name="Label" type="Label" parent="."]
+offset_left = 13.3333
+offset_right = 53.3333
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 16
+text = "2"
+
+[node name="Label_Bold" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+position = Vector2(20, 20)
+shape = SubResource("RectangleShape2D_ge4qc")

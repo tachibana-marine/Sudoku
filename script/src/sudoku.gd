@@ -22,6 +22,8 @@ var selected_cell: Cell = null:
   get():
     return selected_cell
 
+var _cell_scene = load("res://scene/cell.tscn")
+
 var _cells: Array[Cell] = []
 var _boxes: Array[Border] = []
 
@@ -243,7 +245,7 @@ func _init() -> void:
 
   for i in range(9):
     for j in range(9):
-      var cell = Cell.new()
+      var cell = _cell_scene.instantiate()
       $CellHolder.add_child(cell)
       _cells.append(cell)
       _adjust_cell_properties(j, i)
