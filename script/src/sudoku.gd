@@ -2,6 +2,9 @@
 class_name Sudoku
 extends Node2D
 
+signal cell_edited
+signal grid_filled
+
 @export var default_cell_color: Color = Color.WHITE
 @export var selected_cell_color: Color = Color.ORANGE
 
@@ -89,6 +92,29 @@ func get_cells_in_column(index: int) -> Array[Cell]:
   for i in range(9):
     cells_in_column.append(_cells[index + i * 9])
   return cells_in_column
+
+
+# change number of a cell
+func set_number_of_cell(cell: int, number: int):
+  _cells[cell].number = number
+  cell_edited.emit(cell)
+
+  for i in range(9):
+    var cells_in_row = get_cells_in_row(i)
+    if not Sudoku.verify_cells(cells_in_row):
+      return
+
+  for i in range(9):
+    var cells_in_box = get_cells_in_box(i)
+    if not Sudoku.verify_cells(cells_in_box):
+      return
+
+  for i in range(9):
+    var cells_in_column = get_cells_in_column(i)
+    if not Sudoku.verify_cells(cells_in_column):
+      return
+
+  grid_filled.emit()
 
 
 # fill the whole grid (in the future)
@@ -227,7 +253,8 @@ func _input(event: InputEvent) -> void:
     if event.is_pressed:
       var number = int(OS.get_keycode_string(event.keycode))
       if selected_cell and number >= 0:
-        selected_cell.number = number
+        var cell_index = _cells.find(func(cell): return cell == selected_cell)
+        set_number_of_cell(cell_index, number)
 
 
 func _ready() -> void:

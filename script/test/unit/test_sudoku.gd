@@ -221,6 +221,26 @@ func test_cannot_reset_cells_more_than_81():
   assert_eq(0, zero_count)
 
 
+func test_change_cell_number():
+  var sudoku = add_child_autofree(Sudoku.new())
+  sudoku.set_number_of_cell(10, 3)
+  var cells = sudoku.get_cells()
+  assert_eq(cells[10].number, 3)
+
+
+func test_game_completes():
+  var sudoku = add_child_autofree(Sudoku.new())
+  watch_signals(sudoku)
+  sudoku.set_state(2000)
+  sudoku.fill_grid()
+  var cells: Array = sudoku.get_cells()
+  var num = cells[0].number
+  cells[0].number = 0
+
+  sudoku.set_number_of_cell(0, num)
+  assert_signal_emitted(sudoku, "grid_filled")
+
+
 class TestSudokuInput:
   extends GutTest
 
@@ -240,6 +260,8 @@ class TestSudokuInput:
   func test_select_and_change_number_of_a_cell():
     var sudoku = add_child_autofree(Sudoku.new())
     var cells = sudoku.get_cells()
+    watch_signals(sudoku)
+
     _sender.mouse_left_button_down(Vector2.ZERO).hold_for(.2)
     await (_sender.idle)
     assert_eq(sudoku.selected_cell, cells[0])
@@ -247,3 +269,4 @@ class TestSudokuInput:
     _sender.key_down(KEY_7).hold_for(.2)
     await (_sender.idle)
     assert_eq(sudoku.selected_cell.number, 7)
+    assert_signal_emitted_with_parameters(sudoku, "cell_edited", [cells[0]])
