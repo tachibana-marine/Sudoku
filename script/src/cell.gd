@@ -9,18 +9,14 @@ signal on_click
     return size
   set(value):
     size = value
-    if is_inside_tree():
-      _set_label_pos()
-      _set_collision_properties()
-      queue_redraw()
+    queue_redraw()
 
 @export var border_width: int = 1:
   get():
     return border_width
   set(value):
     border_width = value
-    if is_inside_tree():
-      queue_redraw()
+    queue_redraw()
 
 @export var font_size: int = 16:
   get():

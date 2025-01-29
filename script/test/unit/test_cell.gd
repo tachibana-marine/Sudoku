@@ -5,10 +5,9 @@ var _cell_scene = load("res://scene/cell.tscn")
 
 func test_cell_collision():
   var cell = add_child_autofree(_cell_scene.instantiate())
-  cell.size = 20
   var collision = cell.get_node("Collision")
-  assert_eq(collision.shape.size, Vector2(20, 20))
-  assert_eq(collision.position, Vector2(10, 10))
+  assert_eq(collision.shape.size, Vector2(cell.size, cell.size))
+  assert_eq(collision.position, Vector2(cell.size / 2, cell.size / 2))
 
 
 func test_number_is_betweeen_0_to_9():

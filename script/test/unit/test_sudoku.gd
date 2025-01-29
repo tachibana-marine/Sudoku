@@ -22,13 +22,6 @@ func test_sudoku_has_9_boxes():
   assert_eq(boxes.size(), 9)
 
 
-func test_cell_properties():
-  var sudoku = add_child_autofree(Sudoku.new())
-  var cells = sudoku.get_cells()
-  assert_eq(cells[0].font_size, Sudoku.CELL_FONT_SIZE)
-  assert_eq(cells[0].color, Sudoku.DEFAULT_CELL_COLOR)
-
-
 func test_sudoku_cells_has_proper_position():
   var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
@@ -52,7 +45,7 @@ func test_sudoku_cell_changes_color_on_click():
   assert_null(sudoku.selected_cell)
   sudoku._on_click_cell(cells[3])
   assert_eq(sudoku.selected_cell, cells[3])
-  assert_eq(cells[3].color, Sudoku.SELECTED_CELL_COLOR)
+  assert_eq(cells[3].color, sudoku.selected_cell_color)
 
 
 func test_sudoku_resets_color_on_click_cell():
@@ -61,8 +54,8 @@ func test_sudoku_resets_color_on_click_cell():
   sudoku._on_click_cell(cells[3])
   sudoku._on_click_cell(cells[4])
   assert_eq(sudoku.selected_cell, cells[4])
-  assert_eq(cells[3].color, Sudoku.DEFAULT_CELL_COLOR)
-  assert_eq(cells[4].color, Sudoku.SELECTED_CELL_COLOR)
+  assert_eq(cells[3].color, sudoku.default_cell_color)
+  assert_eq(cells[4].color, sudoku.selected_cell_color)
 
 
 func test_verify_sudoku_cells_have_1_to_9():
@@ -202,6 +195,15 @@ func test_randomly_reset_cells():
     if cell.number == 0:
       zero_count += 1
   assert_eq(50, zero_count)
+
+
+func test_make_non_zero_cells_immutable():
+  var sudoku = add_child_autofree(Sudoku.new())
+  var cells = sudoku.get_cells()
+  cells[1].number = 1
+  sudoku.make_non_zero_cells_immutable()
+  assert_false(cells[0].is_immutable)
+  assert_true(cells[1].is_immutable)
 
 
 func test_cannot_reset_cells_more_than_81():

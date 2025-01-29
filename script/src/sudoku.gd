@@ -2,9 +2,8 @@
 class_name Sudoku
 extends Node2D
 
-const CELL_FONT_SIZE = 42
-const DEFAULT_CELL_COLOR = Color.WHITE
-const SELECTED_CELL_COLOR = Color.PURPLE
+@export var default_cell_color: Color = Color.WHITE
+@export var selected_cell_color: Color = Color.ORANGE
 
 var selected_cell: Cell = null:
   get():
@@ -132,6 +131,16 @@ func randomly_reset_cells(num: int):
     _cells[pos].number = 0
 
 
+# make non zero cells immutable
+# other cells become mutable
+func make_non_zero_cells_immutable():
+  for cell in _cells:
+    if cell.number == 0:
+      cell.is_immutable = false
+    else:
+      cell.is_immutable = true
+
+
 # find valid num of the given coord
 # assuming the grid is filled from top-left to bottom-right
 func _find_num(x: int, y: int):
@@ -208,9 +217,9 @@ func _adjust_box_properties(x, y):
 
 func _on_click_cell(cell):
   if selected_cell:
-    selected_cell.color = DEFAULT_CELL_COLOR
+    selected_cell.color = default_cell_color
   selected_cell = cell
-  cell.color = SELECTED_CELL_COLOR
+  cell.color = selected_cell_color
 
 
 func _input(event: InputEvent) -> void:
@@ -227,10 +236,7 @@ func _ready() -> void:
       var cell = _cells[j * 9 + i]
       if not cell.is_inside_tree():
         await cell.ready
-      cell.border_width = 3
       cell.number = 0
-      cell.font_size = CELL_FONT_SIZE
-      cell.color = DEFAULT_CELL_COLOR
       cell.on_click.connect(_on_click_cell)
       _adjust_cell_properties(i, j)
 
