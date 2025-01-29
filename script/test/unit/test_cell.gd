@@ -51,15 +51,12 @@ func test_label_font_size_is_same_as_font_size():
 func test_immutable_property():
   var cell = add_child_autofree(_cell_scene.instantiate())
   var label = cell.get_node("Label")
-  var label_bold = cell.get_node("Label_Bold")
-
   cell.number = 1
+  assert_eq(label.get_theme().get_path(), "res://theme/normal_font.tres")
   cell.is_immutable = true
   cell.number = 2
-
   assert_eq(1, cell.number)
-  assert_false(label.is_visible())
-  assert_true(label_bold.is_visible())
+  assert_eq(label.get_theme().get_path(), "res://theme/bold_font.tres")
 
 
 func test_draw():

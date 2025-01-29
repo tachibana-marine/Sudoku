@@ -2,54 +2,52 @@ extends GutTest
 
 var _cell_scene = load("res://scene/cell.tscn")
 
+var _cell_size: int
+
+
+func before_all():
+  var cell = add_child_autofree(_cell_scene.instantiate())
+  _cell_size = cell.size
+
 
 func test_sudoku_has_9x9_cells():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
   assert_eq(cells.size(), 81)
 
 
 func test_sudoku_has_9_boxes():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   var boxes = sudoku.get_boxes()
   assert_eq(boxes.size(), 9)
 
 
-func test_sudoku_can_change_cell_size():
-  var sudoku = autofree(Sudoku.new())
-  assert_property(sudoku, "cell_size", 10, 90)
-  var cells = sudoku.get_cells()
-  assert_eq(cells[0].size, 90)
-
-
 func test_cell_properties():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
   assert_eq(cells[0].font_size, Sudoku.CELL_FONT_SIZE)
   assert_eq(cells[0].color, Sudoku.DEFAULT_CELL_COLOR)
 
 
 func test_sudoku_cells_has_proper_position():
-  var sudoku = autofree(Sudoku.new())
-  sudoku.cell_size = 20
+  var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
   assert_eq(cells[0].position, Vector2.ZERO)
-  assert_eq(cells[80].position, Vector2(8 * sudoku.cell_size, 8 * sudoku.cell_size))
+  assert_eq(cells[80].position, Vector2(8 * _cell_size, 8 * _cell_size))
 
 
 func test_sudoku_box_border_has_proper_properties():
-  var sudoku = autofree(Sudoku.new())
-  sudoku.cell_size = 20
+  var sudoku = add_child_autofree(Sudoku.new())
   var boxes = sudoku.get_boxes()
   # position
   assert_eq(boxes[0].position, Vector2.ZERO)
-  assert_eq(boxes[8].position, Vector2(20 * 6, 20 * 6))
+  assert_eq(boxes[8].position, Vector2(_cell_size * 6, _cell_size * 6))
   # size
-  assert_eq(boxes[0].size, 20 * 3)
+  assert_eq(boxes[0].size, _cell_size * 3)
 
 
 func test_sudoku_cell_changes_color_on_click():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
   assert_null(sudoku.selected_cell)
   sudoku._on_click_cell(cells[3])
@@ -58,7 +56,7 @@ func test_sudoku_cell_changes_color_on_click():
 
 
 func test_sudoku_resets_color_on_click_cell():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
   sudoku._on_click_cell(cells[3])
   sudoku._on_click_cell(cells[4])
@@ -71,7 +69,7 @@ func test_verify_sudoku_cells_have_1_to_9():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(_cell_scene.instantiate())
+    var cell = add_child_autofree(_cell_scene.instantiate())
     cell.number = i + 1  # 1 to 9
     cells[i] = cell
   assert_true(Sudoku.verify_cells(cells))
@@ -81,7 +79,7 @@ func test_verify_sudoku_cells_have_0():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(_cell_scene.instantiate())
+    var cell = add_child_autofree(_cell_scene.instantiate())
     cell.number = i  # 0 to 8
     cells[i] = cell
   assert_false(Sudoku.verify_cells(cells))
@@ -91,7 +89,7 @@ func test_verify_no_duplicate_cells():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(_cell_scene.instantiate())
+    var cell = add_child_autofree(_cell_scene.instantiate())
     cell.number = i + 1  # 1 to 9
     cells[i] = cell
   assert_true(Sudoku.verify_cells(cells))
@@ -101,7 +99,7 @@ func test_verify_duplicate_cells_exist():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(_cell_scene.instantiate())
+    var cell = add_child_autofree(_cell_scene.instantiate())
     cell.number = i + 1  # 1 to 9
     cells[i] = cell
   cells[8].number = 7  # set a duplicate number
@@ -112,7 +110,7 @@ func test_verify_duplicate_zeros_are_not_counted():
   var cells: Array[Cell] = []
   cells.resize(9)
   for i in range(9):
-    var cell = autofree(_cell_scene.instantiate())
+    var cell = add_child_autofree(_cell_scene.instantiate())
     cell.number = i + 1  # 1 to 9
     cells[i] = cell
   cells[7].number = 0
@@ -121,7 +119,7 @@ func test_verify_duplicate_zeros_are_not_counted():
 
 
 func test_get_box_cells():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
   var expected_cells = [
     cells[3],
@@ -139,7 +137,7 @@ func test_get_box_cells():
 
 
 func test_get_column_cells():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
   var expected_cells = [
     cells[1],
@@ -157,7 +155,7 @@ func test_get_column_cells():
 
 
 func test_get_row_cells():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
   var expected_cells = [
     cells[9],
@@ -174,8 +172,8 @@ func test_get_row_cells():
   assert_eq(expected_cells, box_cells)
 
 
-func test_fill_first_three_rows():
-  var sudoku = autofree(Sudoku.new())
+func test_fill_grid():
+  var sudoku = add_child_autofree(Sudoku.new())
   sudoku.set_state(894789547401239051)
   sudoku.fill_grid()
 
@@ -193,7 +191,7 @@ func test_fill_first_three_rows():
 
 
 func test_randomly_reset_cells():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   sudoku.set_state(100)
   sudoku.fill_grid()
   sudoku.set_state(1000)
@@ -207,7 +205,7 @@ func test_randomly_reset_cells():
 
 
 func test_cannot_reset_cells_more_than_81():
-  var sudoku = autofree(Sudoku.new())
+  var sudoku = add_child_autofree(Sudoku.new())
   sudoku.set_state(100)
   sudoku.fill_grid()
   sudoku.set_state(1000)
@@ -219,48 +217,6 @@ func test_cannot_reset_cells_more_than_81():
       zero_count += 1
   # nothing happens
   assert_eq(0, zero_count)
-
-
-# func test_fill_the_first_box():
-#   var sudoku = autofree(Sudoku.new())
-#   sudoku.fill_first_box()
-#   var cells = sudoku.get_cells_in_box(0)
-#   assert_true(Sudoku.verify_cells(cells))
-
-# func test_fill_the_first_row_of_second_and_third_box():
-#   # I won't test the randomness.
-#   for _i in range(10):
-#     # Test multiple times just to be sure
-#     var sudoku = autofree(Sudoku.new())
-#     sudoku.fill_first_row_of_second_and_third_box()
-#     var cells = sudoku.get_cells_in_row(0)
-#     assert_true(Sudoku.verify_cells(cells))
-
-# func test_fill_the_second_row_of_second_and_third_box():
-#   # I won't test the randomness.
-#   for _i in range(10):
-#     # Test multiple times just to be sure
-#     var sudoku = autofree(Sudoku.new())
-#     sudoku.fill_second_row_of_second_and_third_box()
-#     var cells = sudoku.get_cells_in_row(1)
-#     assert_true(Sudoku.verify_cells(cells))
-#     assert_true(Sudoku.verify_no_duplicate_cells(sudoku.get_cells_in_box(1)))
-#     assert_true(Sudoku.verify_no_duplicate_cells(sudoku.get_cells_in_box(2)))
-
-# func test_sudoku_creates_complete_sudoku_grid():
-#   var sudoku = autofree(Sudoku.new())
-#   sudoku.populate_grid()
-#   var rows = sudoku.get_rows()
-#   var columns = sudoku.get_columns()
-#   var boxes = sudoku.get_boxes()
-
-#   assert_eq(rows.size(), 9)
-#   assert_eq(columns.size(), 9)
-#   assert_eq(boxes.size(), 9)
-
-#   assert_true(rows.all(check_if_sudoku_cells_contains_1_to_9))
-#   assert_true(columns.all(check_if_sudoku_cells_contains_1_to_9))
-#   assert_true(boxes.all(check_if_sudoku_cells_contains_1_to_9))
 
 
 class TestSudokuInput:

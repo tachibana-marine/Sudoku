@@ -22,21 +22,6 @@ signal on_click
     if is_inside_tree():
       queue_redraw()
 
-@export var number: int = 0:  # 0 for empty
-  get():
-    return number
-  set(value):
-    if is_immutable:
-      return
-    if value >= 0 and value <= 9:
-      number = value
-      if is_inside_tree():
-        queue_redraw()
-        if value != 0:
-          $Label.text = str(value)
-        else:
-          $Label.text = ""
-
 @export var font_size: int = 16:
   get():
     return font_size
@@ -44,6 +29,9 @@ signal on_click
     font_size = value
     if is_inside_tree():
       $Label.set("theme_override_font_sizes/font_size", value)
+
+var normal_font = load("res://theme/normal_font.tres")
+var bold_font = load("res://theme/bold_font.tres")
 
 var log_txt: String = "":
   get():
@@ -56,18 +44,29 @@ var color: Color = Color.WHITE:
     color = value
     queue_redraw()
 
-var is_immutable: bool = false:
+@onready var is_immutable: bool = false:
   get():
     return is_immutable
   set(value):
     is_immutable = value
-    if is_inside_tree():
-      if value:
-        $Label.visible = false
-        $Label_Bold.visible = true
+    if value:
+      $Label.set_theme(bold_font)
+    else:
+      $Label.set_theme(normal_font)
+
+@onready var number: int = 0:  # 0 for empty
+  get():
+    return number
+  set(value):
+    if is_immutable:
+      return
+    if value >= 0 and value <= 9:
+      number = value
+      queue_redraw()
+      if value != 0:
+        $Label.text = str(value)
       else:
-        $Label.visible = true
-        $Label_Bold.visible = false
+        $Label.text = ""
 
 
 func _set_label_pos():

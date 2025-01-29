@@ -18,8 +18,6 @@ text = "ver"
 [node name="Sudoku" type="Node2D" parent="."]
 position = Vector2(97, 47)
 script = ExtResource("1_b5wif")
-cell_size = 60
 
 [node name="Cell" parent="." instance=ExtResource("3_6hi43")]
 position = Vector2(696, 126)
-size = 50

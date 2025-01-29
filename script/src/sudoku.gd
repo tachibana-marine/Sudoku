@@ -6,18 +6,6 @@ const CELL_FONT_SIZE = 42
 const DEFAULT_CELL_COLOR = Color.WHITE
 const SELECTED_CELL_COLOR = Color.PURPLE
 
-@export var cell_size: int = 10:
-  get():
-    return cell_size
-  set(value):
-    cell_size = value
-    for y in range(9):
-      for x in range(9):
-        _adjust_cell_properties(x, y)
-    for y in range(3):
-      for x in range(3):
-        _adjust_box_properties(x, y)
-
 var selected_cell: Cell = null:
   get():
     return selected_cell
@@ -208,14 +196,14 @@ func _get_numbers_from_cells(cells: Array[Cell]) -> Array[int]:
 
 func _adjust_cell_properties(x, y):
   var cell = _cells[y * 9 + x]
-  cell.size = cell_size
-  cell.position = Vector2(x * cell_size, y * cell_size)
+  cell.position = Vector2(x * cell.size, y * cell.size)
 
 
 func _adjust_box_properties(x, y):
   var box = _boxes[y * 3 + x]
-  box.size = cell_size * 3
-  box.position = Vector2(x * cell_size * 3, y * cell_size * 3)
+  var cell = _cells[0]
+  box.size = cell.size * 3
+  box.position = Vector2(x * cell.size * 3, y * cell.size * 3)
 
 
 func _on_click_cell(cell):
@@ -233,6 +221,20 @@ func _input(event: InputEvent) -> void:
         selected_cell.number = number
 
 
+func _ready() -> void:
+  for j in range(9):
+    for i in range(9):
+      var cell = _cells[j * 9 + i]
+      if not cell.is_inside_tree():
+        await cell.ready
+      cell.border_width = 3
+      cell.number = 0
+      cell.font_size = CELL_FONT_SIZE
+      cell.color = DEFAULT_CELL_COLOR
+      cell.on_click.connect(_on_click_cell)
+      _adjust_cell_properties(i, j)
+
+
 func _init() -> void:
   _random.randomize()
   var cell_holder = Node2D.new()
@@ -243,17 +245,11 @@ func _init() -> void:
   box_holder.name = "BoxHolder"
   add_child(box_holder)
 
-  for i in range(9):
-    for j in range(9):
+  for j in range(9):
+    for i in range(9):
       var cell = _cell_scene.instantiate()
       $CellHolder.add_child(cell)
       _cells.append(cell)
-      _adjust_cell_properties(j, i)
-      cell.border_width = 3
-      cell.number = 0
-      cell.font_size = CELL_FONT_SIZE
-      cell.color = DEFAULT_CELL_COLOR
-      cell.on_click.connect(_on_click_cell)
 
   for i in range(3):
     for j in range(3):
