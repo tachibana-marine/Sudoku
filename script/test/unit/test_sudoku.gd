@@ -223,8 +223,8 @@ func test_cannot_reset_cells_more_than_81():
 
 func test_change_cell_number():
   var sudoku = add_child_autofree(Sudoku.new())
-  sudoku.set_number_of_cell(10, 3)
   var cells = sudoku.get_cells()
+  sudoku.set_number_of_cell(cells[10], 3)
   assert_eq(cells[10].number, 3)
 
 
@@ -233,12 +233,7 @@ func test_game_completes():
   watch_signals(sudoku)
   sudoku.set_state(2000)
   sudoku.fill_grid()
-  var cells: Array = sudoku.get_cells()
-  var num = cells[0].number
-  cells[0].number = 0
-
-  sudoku.set_number_of_cell(0, num)
-  assert_signal_emitted(sudoku, "grid_filled")
+  assert_true(sudoku.is_complete())
 
 
 class TestSudokuInput:
