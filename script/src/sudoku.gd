@@ -142,6 +142,13 @@ func fill_grid():
     _print_row(k)
 
 
+# Reset all cells
+func reset_cells():
+  for cell in _cells:
+    cell.is_immutable = false
+    cell.number = 0
+
+
 # Randomly reset <num> cells to zero
 func randomly_reset_cells(num: int):
   print("randomly_reset_cells state: ", _random.state)

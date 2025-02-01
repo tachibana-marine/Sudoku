@@ -183,6 +183,16 @@ func test_fill_grid():
     assert_true(Sudoku.verify_cells(cells_in_column))
 
 
+func test_reset_cells():
+  var sudoku = add_child_autofree(Sudoku.new())
+  sudoku.set_state(400)
+  sudoku.fill_grid()
+  sudoku.reset_cells()
+  var cells = sudoku.get_cells()
+  assert_eq(cells[10].number, 0)
+  assert_eq(cells[10].is_immutable, false)
+
+
 func test_randomly_reset_cells():
   var sudoku = add_child_autofree(Sudoku.new())
   sudoku.set_state(100)

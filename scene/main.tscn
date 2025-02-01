@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="uid://dnjqpuv0nt1si"]
+
+[ext_resource type="Script" path="res://script/src/main.gd" id="1_qqifp"]
+[ext_resource type="Script" path="res://script/src/sudoku.gd" id="2_4v05g"]
+
+[node name="Main" type="Node2D"]
+position = Vector2(0, -1)
+script = ExtResource("1_qqifp")
+removed_cells = 2
+
+[node name="Version" type="Label" parent="."]
+offset_left = 126.0
+offset_top = -3.0
+offset_right = 166.0
+offset_bottom = 20.0
+text = "ver"
+
+[node name="Sudoku" type="Node2D" parent="."]
+position = Vector2(93, 49)
+script = ExtResource("2_4v05g")
+
+[node name="ClearWindow" type="Node2D" parent="."]
+visible = false
+
+[node name="Label" type="Label" parent="ClearWindow"]
+offset_left = 270.0
+offset_top = 242.0
+offset_right = 464.0
+offset_bottom = 338.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 70
+text = "Clear!"
+
+[connection signal="cell_edited" from="Sudoku" to="." method="_on_sudoku_cell_edited"]

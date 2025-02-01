@@ -1,6 +1,8 @@
 extends GutTest
 
 
+# This test class causes memory leak if run in headless mode.
+# I believe this is a Gut problem.
 func test_border_exists():
   var border = autofree(Border.new())
   assert_not_null(border)
