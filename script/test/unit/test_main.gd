@@ -18,6 +18,19 @@ func test_main_scene_has_version_number():
   assert_eq(main.get_node("Version").text, Constants.VERSION_NUMBER)
 
 
+func test_sudoku_automatically_generated_after_ready():
+  # not adding to the tree to avoid running _ready
+  var main = autofree(_scene.instantiate())
+  var sudoku = main.get_node("Sudoku")
+  sudoku.set_state(1000)
+  watch_signals(sudoku)
+  # assert_false(sudoku.is_visible())
+  main.scene_loaded.emit()
+  # assert_true(sudoku.is_visible())
+  assert_signal_emitted(sudoku, "grid_filled")
+  assert_signal_emitted(sudoku, "cells_removed")
+
+
 func test_clear_window_shows_up_on_complete():
   var main = add_child_autofree(_scene.instantiate())
   assert_false(main.get_node("ClearWindow").is_visible())

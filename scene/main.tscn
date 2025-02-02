@@ -32,4 +32,5 @@ theme_override_constants/outline_size = 10
 theme_override_font_sizes/font_size = 70
 text = "Clear!"
 
+[connection signal="scene_loaded" from="." to="." method="_on_scene_loaded"]
 [connection signal="cell_edited" from="Sudoku" to="." method="_on_sudoku_cell_edited"]

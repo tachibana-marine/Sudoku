@@ -3,6 +3,8 @@ class_name Sudoku
 extends Node2D
 
 signal cell_edited
+signal grid_filled
+signal cells_removed
 
 @export var default_cell_color: Color = Color.WHITE
 @export var selected_cell_color: Color = Color.ORANGE
@@ -75,7 +77,8 @@ func is_complete() -> bool:
   return true
 
 
-# fill the whole grid (in the future)
+# fill the whole grid
+# emits grid_filled
 func fill_grid():
   print("fill_grid state: ", _random.state)
   var i = 0
@@ -96,6 +99,7 @@ func fill_grid():
       break
   for k in range(9):
     _print_row(k)
+  grid_filled.emit()
 
 
 # Reset all cells
@@ -105,24 +109,8 @@ func reset_cells():
     cell.number = 0
 
 
-# Randomly reset <num> cells to zero
-func randomly_reset_cells(num: int):
-  print("randomly_reset_cells state: ", _random.state)
-  if num > 81:
-    return
-  var remove_pos = []
-  for i in range(num):
-    while true:
-      var pos = _random.randi_range(0, 80)
-      if pos not in remove_pos:
-        remove_pos.append(pos)
-        break
-  print(remove_pos)
-  for pos in remove_pos:
-    _cells[pos].number = 0
-
-
-# Create sudoku grid with
+# Remove as much cells as possible, while making sure there's only one solution
+# emits cells_removed
 func reset_as_much_as_possible_with_unique_solutions():
   var remove_pos = []
   # FIXME: soooooo inefficient.
@@ -140,6 +128,7 @@ func reset_as_much_as_possible_with_unique_solutions():
     if SudokuUtil.backtrack_cell(cells_copy, 0, 0) > 1:
       _cells[index].number = num
       break
+  cells_removed.emit()
 
 
 # make non zero cells immutable
