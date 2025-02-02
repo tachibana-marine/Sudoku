@@ -178,6 +178,21 @@ func test_cannot_reset_cells_more_than_81():
   assert_eq(0, zero_count)
 
 
+func test_reset_as_much_as_possible_with_unique_solutions():
+  var sudoku = add_child_autofree(Sudoku.new())
+  sudoku.set_state(100)
+  sudoku.fill_grid()
+  sudoku.set_state(200)
+  sudoku.reset_as_much_as_possible_with_unique_solutions()
+  var cells = sudoku.get_cells()
+  var zero_count = 0
+  for cell in cells:
+    if cell.number == 0:
+      zero_count += 1
+  assert_ne(zero_count, 0)
+  assert_eq(SudokuUtil.backtrack_cell(cells, 0, 0), 1)
+
+
 func test_change_cell_number():
   var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
@@ -191,18 +206,6 @@ func test_game_completes():
   sudoku.set_state(2000)
   sudoku.fill_grid()
   assert_true(sudoku.is_complete())
-
-
-func test_has_unique_solution_for_obvious_case():
-  var sudoku = add_child_autofree(Sudoku.new())
-  sudoku.set_state(500)
-
-  # fill the grid, then reset the first cell.
-  # -> there is only one solution
-  sudoku.fill_grid()
-  var cells = sudoku.get_cells()
-  cells[0].number = 0
-  # assert_true(sudoku.has_unique_solution())
 
 
 class TestSudokuInput:

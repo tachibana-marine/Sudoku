@@ -122,6 +122,26 @@ func randomly_reset_cells(num: int):
     _cells[pos].number = 0
 
 
+# Create sudoku grid with
+func reset_as_much_as_possible_with_unique_solutions():
+  var remove_pos = []
+  # FIXME: soooooo inefficient.
+  for i in range(_cells.size()):
+    var pos
+    while true:
+      pos = _random.randi_range(0, 80)
+      if pos not in remove_pos:
+        remove_pos.append(pos)
+        break
+  for index in remove_pos:
+    var num = _cells[index].number
+    _cells[index].number = 0
+    var cells_copy = _cells.duplicate()
+    if SudokuUtil.backtrack_cell(cells_copy, 0, 0) > 1:
+      _cells[index].number = num
+      break
+
+
 # make non zero cells immutable
 # other cells become mutable
 func make_non_zero_cells_immutable():
@@ -133,13 +153,10 @@ func make_non_zero_cells_immutable():
 
 
 # return true if the grid has only one solution, otherwise return false.
-func has_unique_solution() -> bool:
+func _has_unique_solution() -> bool:
   var cells_copy = _cells.duplicate()
-  for cell in cells_copy:
-    if cell.number != 0:
-      continue
-    # _backtrack_cell(cells_copy, cell, 0)
-
+  if SudokuUtil.backtrack_cell(cells_copy, 0, 0) == 1:
+    return true
   return false
 
 

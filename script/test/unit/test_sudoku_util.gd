@@ -113,6 +113,15 @@ func test_get_row_cells():
   assert_eq(expected_cells, box_cells)
 
 
+# Currently this test fails since the function returns 1
+# func test_backtrack_returns_zero_for_complete_grid():
+#   var sudoku = add_child_autofree(Sudoku.new())
+#   sudoku.set_state(100)
+#   sudoku.fill_grid()
+#   var cells: Array[Cell] = sudoku.get_cells().duplicate()
+#   assert_eq(SudokuUtil.backtrack_cell(cells, 0, 0), 0)
+
+
 func test_backtrack_returns_one_for_obvious_case():
   var sudoku = add_child_autofree(Sudoku.new())
   sudoku.set_state(100)

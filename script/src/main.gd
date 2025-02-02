@@ -6,7 +6,8 @@ extends Node2D
 func _ready() -> void:
   $Version.text = Constants.VERSION_NUMBER
   $Sudoku.fill_grid()
-  $Sudoku.randomly_reset_cells(removed_cells)
+  # $Sudoku.randomly_reset_cells(removed_cells)
+  $Sudoku.reset_as_much_as_possible_with_unique_solutions()
   $Sudoku.make_non_zero_cells_immutable()
 
 

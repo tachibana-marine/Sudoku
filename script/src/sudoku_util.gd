@@ -68,7 +68,7 @@ static func print_row(index: int, cells: Array[Cell]):
   print(nums)
 
 
-# count solutions
+# count solutions.
 static func backtrack_cell(cells: Array[Cell], index: int, count: int) -> int:
   var verify_sudoku = func() -> bool:
     for row in range(9):
@@ -97,6 +97,10 @@ static func backtrack_cell(cells: Array[Cell], index: int, count: int) -> int:
 
   for i in range(9):
     cells[index].number = i + 1
+    #print("=--------------------------------=")
+    for j in range(9):
+      #print_row(j, cells)
+      pass
     if verify_sudoku.call():
       if index == cells.size() - 1:
         return count + 1
