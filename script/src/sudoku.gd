@@ -19,34 +19,6 @@ var _boxes: Array[Border] = []
 var _random: RandomNumberGenerator = RandomNumberGenerator.new()
 
 
-# verify given cells contains 1 to 9
-static func verify_cells(cells: Array[Cell]):
-  var count = []
-  count.resize(9)
-  count.fill(0)
-  for cell in cells:
-    if cell.number == 0:
-      return false
-    count[cell.number - 1] = 1
-  if count.all(func(num): return num == 1):
-    return true
-  return false
-
-
-# verify there is no duplicate cells (cells with number=0 are not counted)
-static func verify_no_duplicate_cells(cells: Array[Cell]):
-  var count = []
-  count.resize(9)
-  count.fill(0)
-  for cell in cells:
-    if cell.number == 0:
-      continue
-    count[cell.number - 1] += 1
-  if count.all(func(num): return num <= 1):
-    return true
-  return false
-
-
 # set state
 func set_state(state: int):
   _random.set_state(state)
@@ -64,36 +36,20 @@ func get_boxes():
 
 # return cells in the given box. The index starts with 0.
 func get_cells_in_box(index: int) -> Array[Cell]:
-  var x = index % 3
-  var y = int(index / 3.0)  # silence the linter
-  # get index of the top left cell of the box
-  var start_index = x * 3 + y * 9 * 3
-  var cells_in_box: Array[Cell] = []
-  for j in range(3):
-    for i in range(3):
-      var cell_index = start_index + i + j * 9
-      cells_in_box.append(_cells[cell_index])
-  return cells_in_box
+  return SudokuUtil.get_cells_in_box(index, _cells)
 
 
 # return cells in the given row. The index starts with 0.
 func get_cells_in_row(index: int) -> Array[Cell]:
-  var start_index = index * 9
-  var cells_in_row: Array[Cell] = []
-  for i in range(9):
-    cells_in_row.append(_cells[start_index + i])
-  return cells_in_row
+  return SudokuUtil.get_cells_in_row(index, _cells)
 
 
 # return cells in the given column. The index starts with 0
 func get_cells_in_column(index: int) -> Array[Cell]:
-  var cells_in_column: Array[Cell] = []
-  for i in range(9):
-    cells_in_column.append(_cells[index + i * 9])
-  return cells_in_column
+  return SudokuUtil.get_cells_in_column(index, _cells)
 
 
-# change number of a cell
+# change number of a cell and emit cell_edited
 func set_number_of_cell(cell: Cell, number: int):
   cell.number = number
   cell_edited.emit(cell)
@@ -103,17 +59,17 @@ func set_number_of_cell(cell: Cell, number: int):
 func is_complete() -> bool:
   for i in range(9):
     var cells_in_row = get_cells_in_row(i)
-    if not Sudoku.verify_cells(cells_in_row):
+    if not SudokuUtil.verify_cells(cells_in_row):
       return false
 
   for i in range(9):
     var cells_in_box = get_cells_in_box(i)
-    if not Sudoku.verify_cells(cells_in_box):
+    if not SudokuUtil.verify_cells(cells_in_box):
       return false
 
   for i in range(9):
     var cells_in_column = get_cells_in_column(i)
-    if not Sudoku.verify_cells(cells_in_column):
+    if not SudokuUtil.verify_cells(cells_in_column):
       return false
 
   return true
@@ -176,6 +132,17 @@ func make_non_zero_cells_immutable():
       cell.is_immutable = true
 
 
+# return true if the grid has only one solution, otherwise return false.
+func has_unique_solution() -> bool:
+  var cells_copy = _cells.duplicate()
+  for cell in cells_copy:
+    if cell.number != 0:
+      continue
+    # _backtrack_cell(cells_copy, cell, 0)
+
+  return false
+
+
 # find valid num of the given coord
 # assuming the grid is filled from top-left to bottom-right
 func _find_num(x: int, y: int):
@@ -194,11 +161,7 @@ func _find_num(x: int, y: int):
 
 # print row
 func _print_row(i: int):
-  var cells = get_cells_in_row(i)
-  var nums = []
-  for cell in cells:
-    nums.append(cell.number)
-  print(nums)
+  SudokuUtil.print_row(i, _cells)
 
 
 # get first three numbers of an array

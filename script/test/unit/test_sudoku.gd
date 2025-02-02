@@ -58,60 +58,7 @@ func test_sudoku_resets_color_on_click_cell():
   assert_eq(cells[4].color, sudoku.selected_cell_color)
 
 
-func test_verify_sudoku_cells_have_1_to_9():
-  var cells: Array[Cell] = []
-  cells.resize(9)
-  for i in range(9):
-    var cell = add_child_autofree(_cell_scene.instantiate())
-    cell.number = i + 1  # 1 to 9
-    cells[i] = cell
-  assert_true(Sudoku.verify_cells(cells))
-
-
-func test_verify_sudoku_cells_have_0():
-  var cells: Array[Cell] = []
-  cells.resize(9)
-  for i in range(9):
-    var cell = add_child_autofree(_cell_scene.instantiate())
-    cell.number = i  # 0 to 8
-    cells[i] = cell
-  assert_false(Sudoku.verify_cells(cells))
-
-
-func test_verify_no_duplicate_cells():
-  var cells: Array[Cell] = []
-  cells.resize(9)
-  for i in range(9):
-    var cell = add_child_autofree(_cell_scene.instantiate())
-    cell.number = i + 1  # 1 to 9
-    cells[i] = cell
-  assert_true(Sudoku.verify_cells(cells))
-
-
-func test_verify_duplicate_cells_exist():
-  var cells: Array[Cell] = []
-  cells.resize(9)
-  for i in range(9):
-    var cell = add_child_autofree(_cell_scene.instantiate())
-    cell.number = i + 1  # 1 to 9
-    cells[i] = cell
-  cells[8].number = 7  # set a duplicate number
-  assert_false(Sudoku.verify_no_duplicate_cells(cells))
-
-
-func test_verify_duplicate_zeros_are_not_counted():
-  var cells: Array[Cell] = []
-  cells.resize(9)
-  for i in range(9):
-    var cell = add_child_autofree(_cell_scene.instantiate())
-    cell.number = i + 1  # 1 to 9
-    cells[i] = cell
-  cells[7].number = 0
-  cells[8].number = 0
-  assert_true(Sudoku.verify_no_duplicate_cells(cells))
-
-
-func test_get_box_cells():
+func test_get_box_cell():
   var sudoku = add_child_autofree(Sudoku.new())
   var cells = sudoku.get_cells()
   var expected_cells = [
@@ -172,15 +119,15 @@ func test_fill_grid():
 
   for i in range(9):
     var cells_in_row = sudoku.get_cells_in_row(i)
-    assert_true(Sudoku.verify_cells(cells_in_row))
+    assert_true(SudokuUtil.verify_cells(cells_in_row))
 
   for i in range(9):
     var cells_in_box = sudoku.get_cells_in_box(i)
-    assert_true(Sudoku.verify_cells(cells_in_box))
+    assert_true(SudokuUtil.verify_cells(cells_in_box))
 
   for i in range(9):
     var cells_in_column = sudoku.get_cells_in_column(i)
-    assert_true(Sudoku.verify_cells(cells_in_column))
+    assert_true(SudokuUtil.verify_cells(cells_in_column))
 
 
 func test_reset_cells():
@@ -244,6 +191,18 @@ func test_game_completes():
   sudoku.set_state(2000)
   sudoku.fill_grid()
   assert_true(sudoku.is_complete())
+
+
+func test_has_unique_solution_for_obvious_case():
+  var sudoku = add_child_autofree(Sudoku.new())
+  sudoku.set_state(500)
+
+  # fill the grid, then reset the first cell.
+  # -> there is only one solution
+  sudoku.fill_grid()
+  var cells = sudoku.get_cells()
+  cells[0].number = 0
+  # assert_true(sudoku.has_unique_solution())
 
 
 class TestSudokuInput:

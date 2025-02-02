@@ -6,7 +6,7 @@
 [node name="Main" type="Node2D"]
 position = Vector2(0, -1)
 script = ExtResource("1_qqifp")
-removed_cells = 2
+removed_cells = 50
 
 [node name="Version" type="Label" parent="."]
 offset_left = 126.0
