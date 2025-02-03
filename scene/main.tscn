@@ -32,5 +32,12 @@ theme_override_constants/outline_size = 10
 theme_override_font_sizes/font_size = 70
 text = "Clear!"
 
-[connection signal="scene_loaded" from="." to="." method="_on_scene_loaded"]
+[node name="Button" type="Button" parent="."]
+offset_left = 722.0
+offset_top = 502.0
+offset_right = 996.0
+offset_bottom = 562.0
+text = "Button"
+
 [connection signal="cell_edited" from="Sudoku" to="." method="_on_sudoku_cell_edited"]
+[connection signal="pressed" from="Button" to="." method="_on_scene_loaded"]

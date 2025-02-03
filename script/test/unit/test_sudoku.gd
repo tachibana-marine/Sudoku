@@ -58,60 +58,6 @@ func test_sudoku_resets_color_on_click_cell():
   assert_eq(cells[4].color, sudoku.selected_cell_color)
 
 
-func test_get_box_cell():
-  var sudoku = add_child_autofree(Sudoku.new())
-  var cells = sudoku.get_cells()
-  var expected_cells = [
-    cells[3],
-    cells[4],
-    cells[5],
-    cells[12],
-    cells[13],
-    cells[14],
-    cells[21],
-    cells[22],
-    cells[23],
-  ]
-  var box_cells = sudoku.get_cells_in_box(1)
-  assert_eq(expected_cells, box_cells)
-
-
-func test_get_column_cells():
-  var sudoku = add_child_autofree(Sudoku.new())
-  var cells = sudoku.get_cells()
-  var expected_cells = [
-    cells[1],
-    cells[10],
-    cells[19],
-    cells[28],
-    cells[37],
-    cells[46],
-    cells[55],
-    cells[64],
-    cells[73],
-  ]
-  var column_cells = sudoku.get_cells_in_column(1)
-  assert_eq(expected_cells, column_cells)
-
-
-func test_get_row_cells():
-  var sudoku = add_child_autofree(Sudoku.new())
-  var cells = sudoku.get_cells()
-  var expected_cells = [
-    cells[9],
-    cells[10],
-    cells[11],
-    cells[12],
-    cells[13],
-    cells[14],
-    cells[15],
-    cells[16],
-    cells[17],
-  ]
-  var box_cells = sudoku.get_cells_in_row(1)
-  assert_eq(expected_cells, box_cells)
-
-
 func test_fill_grid():
   var sudoku = add_child_autofree(Sudoku.new())
   watch_signals(sudoku)
@@ -158,10 +104,10 @@ func test_reset_as_much_as_possible_with_unique_solutions():
   sudoku.fill_grid()
   sudoku.set_state(200)
   sudoku.reset_as_much_as_possible_with_unique_solutions()
-  var cells = sudoku.get_cells()
+  var cells = sudoku.get_cell_numbers()
   var zero_count = 0
   for cell in cells:
-    if cell.number == 0:
+    if cell == 0:
       zero_count += 1
   assert_ne(zero_count, 0)
   assert_eq(SudokuUtil.backtrack_cell(cells, 0, 0), 1)

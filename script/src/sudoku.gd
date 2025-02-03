@@ -31,24 +31,32 @@ func get_cells():
   return _cells
 
 
+# return cells as an int array
+func get_cell_numbers() -> Array[int]:
+  var nums: Array[int] = []
+  for cell in _cells:
+    nums.append(cell.number)
+  return nums
+
+
 # return boxes as an array ordered from top left to bottom right
 func get_boxes():
   return _boxes
 
 
 # return cells in the given box. The index starts with 0.
-func get_cells_in_box(index: int) -> Array[Cell]:
-  return SudokuUtil.get_cells_in_box(index, _cells)
+func get_cells_in_box(index: int) -> Array[int]:
+  return SudokuUtil.get_cells_in_box(index, get_cell_numbers())
 
 
 # return cells in the given row. The index starts with 0.
-func get_cells_in_row(index: int) -> Array[Cell]:
-  return SudokuUtil.get_cells_in_row(index, _cells)
+func get_cells_in_row(index: int) -> Array[int]:
+  return SudokuUtil.get_cells_in_row(index, get_cell_numbers())
 
 
 # return cells in the given column. The index starts with 0
-func get_cells_in_column(index: int) -> Array[Cell]:
-  return SudokuUtil.get_cells_in_column(index, _cells)
+func get_cells_in_column(index: int) -> Array[int]:
+  return SudokuUtil.get_cells_in_column(index, get_cell_numbers())
 
 
 # change number of a cell and emit cell_edited
@@ -81,22 +89,26 @@ func is_complete() -> bool:
 # emits grid_filled
 func fill_grid():
   print("fill_grid state: ", _random.state)
+  var cell_numbers: Array[int] = get_cell_numbers()
   var i = 0
   while i < 81:
     var x = i % 9
     var y = int(i / 9.0)
-    var num = _find_num(x, y)
+    var num = _find_num(x, y, cell_numbers)
     if num == 0:
       # reset to the start
       for k in range(i):
-        _cells[i - k - 1].number = 0
+        cell_numbers[i - k - 1] = 0
       i = 0
       continue
-    _cells[i].number = num
+    cell_numbers[i] = num
     i += 1
     if i >= 9 * 9:
       # early break for now
       break
+  for index in range(cell_numbers.size()):
+    _cells[index].number = cell_numbers[index]
+
   for k in range(9):
     _print_row(k)
   grid_filled.emit()
@@ -113,6 +125,7 @@ func reset_cells():
 # emits cells_removed
 func reset_as_much_as_possible_with_unique_solutions():
   var remove_pos = []
+  var cell_numbers: Array[int] = get_cell_numbers()
   # FIXME: soooooo inefficient.
   for i in range(_cells.size()):
     var pos
@@ -121,13 +134,17 @@ func reset_as_much_as_possible_with_unique_solutions():
       if pos not in remove_pos:
         remove_pos.append(pos)
         break
+
   for index in remove_pos:
-    var num = _cells[index].number
-    _cells[index].number = 0
-    var cells_copy = _cells.duplicate()
-    if SudokuUtil.backtrack_cell(cells_copy, 0, 0) > 1:
-      _cells[index].number = num
+    var num = cell_numbers[index]
+    cell_numbers[index] = 0
+    if SudokuUtil.backtrack_cell(cell_numbers, 0, 0) > 1:
+      cell_numbers[index] = num
       break
+
+  for index in range(cell_numbers.size()):
+    _cells[index].number = cell_numbers[index]
+
   cells_removed.emit()
 
 
@@ -151,13 +168,13 @@ func _has_unique_solution() -> bool:
 
 # find valid num of the given coord
 # assuming the grid is filled from top-left to bottom-right
-func _find_num(x: int, y: int):
+func _find_num(x: int, y: int, cells: Array[int]):
   # numbers can be in there
   var int_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9]
   var box = int(x / 3.0) + int(y / 3.0) * 3
-  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_box(box)))
-  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_column(x)))
-  int_pool = _subtract_array(int_pool, _get_numbers_from_cells(get_cells_in_row(y)))
+  int_pool = _subtract_array(int_pool, SudokuUtil.get_cells_in_box(box, cells))
+  int_pool = _subtract_array(int_pool, SudokuUtil.get_cells_in_column(x, cells))
+  int_pool = _subtract_array(int_pool, SudokuUtil.get_cells_in_row(y, cells))
 
   if int_pool.size() == 0:
     return 0
@@ -167,7 +184,7 @@ func _find_num(x: int, y: int):
 
 # print row
 func _print_row(i: int):
-  SudokuUtil.print_row(i, _cells)
+  SudokuUtil.print_row(i, get_cell_numbers())
 
 
 # get first three numbers of an array
