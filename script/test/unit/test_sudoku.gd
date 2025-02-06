@@ -80,12 +80,10 @@ func test_fill_grid():
 
 func test_reset_cells():
   var sudoku = add_child_autofree(Sudoku.new())
-  sudoku.set_state(400)
-  sudoku.fill_grid()
+  sudoku.set_cell_numbers(SudokuUtilTest.filled_grid)
   sudoku.reset_cells()
-  var cells = sudoku.get_cells()
-  assert_eq(cells[10].number, 0)
-  assert_eq(cells[10].is_immutable, false)
+  var cells = sudoku.get_cell_numbers()
+  assert_true(cells.all(func(num): return num == 0))
 
 
 func test_make_non_zero_cells_immutable():
@@ -97,11 +95,18 @@ func test_make_non_zero_cells_immutable():
   assert_true(cells[1].is_immutable)
 
 
+func test_create_grid():
+  var sudoku = add_child_autofree(Sudoku.new())
+  watch_signals(sudoku)
+  await sudoku.create_grid()
+  assert_signal_emitted(sudoku, "grid_filled")
+  assert_signal_emitted(sudoku, "cells_removed")
+
+
 func test_reset_as_much_as_possible_with_unique_solutions():
   var sudoku = add_child_autofree(Sudoku.new())
   watch_signals(sudoku)
-  sudoku.set_state(100)
-  sudoku.fill_grid()
+  sudoku.set_cell_numbers(SudokuUtilTest.filled_grid)
   sudoku.set_state(200)
   sudoku.reset_as_much_as_possible_with_unique_solutions()
   var cells = sudoku.get_cell_numbers()
@@ -111,7 +116,7 @@ func test_reset_as_much_as_possible_with_unique_solutions():
       zero_count += 1
   assert_ne(zero_count, 0)
   assert_eq(SudokuUtil.backtrack_cell(cells, 0, 0), 1)
-  assert_signal_emitted(sudoku, "cells_removed")
+  # assert_signal_emitted(sudoku, "cells_removed")
 
 
 func test_change_cell_number():

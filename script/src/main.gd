@@ -5,12 +5,15 @@ extends Node2D
 
 func _ready() -> void:
   $Version.text = Constants.VERSION_NUMBER
+  _on_scene_loaded()
 
 
 func _on_scene_loaded() -> void:
-  await $Sudoku.fill_grid()
-  await $Sudoku.reset_as_much_as_possible_with_unique_solutions()
-  await $Sudoku.make_non_zero_cells_immutable()
+  $Sudoku.fill_grid()
+  $Sudoku.reset_as_much_as_possible_with_unique_solutions()
+  await $Sudoku.grid_filled
+  await $Sudoku.cells_removed
+  $Sudoku.make_non_zero_cells_immutable()
 
 
 func _on_complete():

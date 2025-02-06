@@ -39,6 +39,13 @@ func get_cell_numbers() -> Array[int]:
   return nums
 
 
+# set number of cells
+# The array size should be 81
+func set_cell_numbers(nums: Array[int]):
+  for i in range(nums.size()):
+    _cells[i].number = nums[i]
+
+
 # return boxes as an array ordered from top left to bottom right
 func get_boxes():
   return _boxes
@@ -88,27 +95,9 @@ func is_complete() -> bool:
 # fill the whole grid
 # emits grid_filled
 func fill_grid():
-  print("fill_grid state: ", _random.state)
-  var cell_numbers: Array[int] = get_cell_numbers()
-  var i = 0
-  while i < 81:
-    var x = i % 9
-    var y = int(i / 9.0)
-    var num = _find_num(x, y, cell_numbers)
-    if num == 0:
-      # reset to the start
-      for k in range(i):
-        cell_numbers[i - k - 1] = 0
-      i = 0
-      continue
-    cell_numbers[i] = num
-    i += 1
-    if i >= 9 * 9:
-      # early break for now
-      break
+  var cell_numbers = SudokuUtil.create_filled_grid(_random)
   for index in range(cell_numbers.size()):
     _cells[index].number = cell_numbers[index]
-
   for k in range(9):
     _print_row(k)
   grid_filled.emit()
@@ -158,6 +147,11 @@ func make_non_zero_cells_immutable():
       cell.is_immutable = true
 
 
+# create valid sudoku grid.
+func create_grid():
+  pass
+
+
 # return true if the grid has only one solution, otherwise return false.
 func _has_unique_solution() -> bool:
   var cells_copy = _cells.duplicate()
@@ -166,62 +160,9 @@ func _has_unique_solution() -> bool:
   return false
 
 
-# find valid num of the given coord
-# assuming the grid is filled from top-left to bottom-right
-func _find_num(x: int, y: int, cells: Array[int]):
-  # numbers can be in there
-  var int_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-  var box = int(x / 3.0) + int(y / 3.0) * 3
-  int_pool = _subtract_array(int_pool, SudokuUtil.get_cells_in_box(box, cells))
-  int_pool = _subtract_array(int_pool, SudokuUtil.get_cells_in_column(x, cells))
-  int_pool = _subtract_array(int_pool, SudokuUtil.get_cells_in_row(y, cells))
-
-  if int_pool.size() == 0:
-    return 0
-  var num = _pop_some_random_numbers(int_pool, 1)[0]
-  return num
-
-
 # print row
 func _print_row(i: int):
   SudokuUtil.print_row(i, get_cell_numbers())
-
-
-# get first three numbers of an array
-func _get_first_some_cells_num(cells: Array[Cell], num = 3):
-  var first_three_nums = []
-  for i in range(num):
-    first_three_nums.append(cells[i].number)
-  return first_three_nums
-
-
-# remove numbers in array2 from array1
-func _subtract_array(array1: Array, array2: Array) -> Array:
-  var array1_copy = array1.duplicate()
-  for num in array2:
-    if num in array1_copy:
-      array1_copy.erase(num)
-  return array1_copy
-
-
-# pop some numbers from an array
-func _pop_some_random_numbers(numbers: Array, amount = 3):
-  var three_numbers = []
-  for i in range(amount):
-    var index = _random.randi_range(0, numbers.size() - 1)
-    var num = numbers[index]
-    numbers.erase(num)
-    three_numbers.append(num)
-  return three_numbers
-
-
-# get numbers other than zero from cells in an array
-func _get_numbers_from_cells(cells: Array[Cell]) -> Array[int]:
-  var nums: Array[int] = []
-  for cell in cells:
-    if cell.number != 0:
-      nums.append(cell.number)
-  return nums
 
 
 func _adjust_cell_properties(x, y):

@@ -1,6 +1,27 @@
+class_name SudokuUtilTest
 extends GutTest
 
-var _cell_scene = load("res://scene/cell.tscn")
+static var _readable_filled_grid: Array[Array] = [
+  [5, 6, 9, 3, 4, 2, 1, 8, 7],
+  [7, 3, 8, 9, 1, 5, 6, 4, 2],
+  [4, 2, 1, 8, 6, 7, 5, 9, 3],
+  [8, 5, 7, 1, 2, 4, 9, 3, 6],
+  [9, 1, 6, 5, 8, 3, 7, 2, 4],
+  [3, 4, 2, 7, 9, 6, 8, 5, 1],
+  [2, 7, 4, 6, 5, 8, 3, 1, 9],
+  [1, 8, 3, 2, 7, 9, 4, 6, 5],
+  [6, 9, 5, 4, 3, 1, 2, 7, 8]
+]
+
+static var filled_grid: Array[int] = _unpack_rows(_readable_filled_grid)
+
+
+static func _unpack_rows(grid_with_rows: Array[Array]) -> Array[int]:
+  var cells: Array[int] = []
+  for row in grid_with_rows:
+    for num in row:
+      cells.append(num)
+  return cells
 
 
 func test_verify_sudoku_cells_have_1_to_9():
@@ -116,23 +137,30 @@ func test_get_row_cells():
 #   assert_eq(SudokuUtil.backtrack_cell(cells, 0, 0), 0)
 
 
+func test_is_complete():
+  assert_true(SudokuUtil.is_complete(filled_grid))
+
+
+func test_create_filled_grid():
+  var rng = RandomNumberGenerator.new()
+  rng.set_state(1000)
+  var created_filled_grid = SudokuUtil.create_filled_grid(rng)
+  assert_true(SudokuUtil.is_complete(created_filled_grid))
+
+
 func test_backtrack_returns_one_for_obvious_case():
-  var sudoku = add_child_autofree(Sudoku.new())
-  sudoku.set_state(100)
-  sudoku.fill_grid()
-  var cells: Array[int] = sudoku.get_cell_numbers()
+  var cells: Array[int] = filled_grid.duplicate()
   # remove first = there is 1 solution
   cells[0] = 0
   assert_eq(SudokuUtil.backtrack_cell(cells, 0, 0), 1)
 
 
 func test_backtrack_returns_two_for_obvious_case():
-  var sudoku = add_child_autofree(Sudoku.new())
-  sudoku.set_state(100)
-  sudoku.fill_grid()
-  var cells: Array[int] = sudoku.get_cell_numbers()
+  var cells: Array[int] = filled_grid.duplicate()
   # remove 4 and 8 = 4 and 8 is interchangable now = there are 2 solutions
   for i in range(cells.size()):
     if cells[i] == 4 or cells[i] == 8:
       cells[i] = 0
+  for k in range(9):
+    SudokuUtil.print_row(k, cells)
   assert_eq(SudokuUtil.backtrack_cell(cells, 0, 0), 2)
