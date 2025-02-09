@@ -5,6 +5,7 @@ extends Node2D
 signal cell_edited
 signal grid_filled
 signal cells_removed
+signal grid_created
 
 @export var default_cell_color: Color = Color.WHITE
 @export var selected_cell_color: Color = Color.ORANGE
@@ -19,6 +20,8 @@ var _cells: Array[Cell] = []
 var _boxes: Array[Border] = []
 
 var _random: RandomNumberGenerator = RandomNumberGenerator.new()
+
+var _thread: Thread
 
 
 # set state
@@ -147,9 +150,34 @@ func make_non_zero_cells_immutable():
       cell.is_immutable = true
 
 
-# create valid sudoku grid.
 func create_grid():
-  pass
+  _thread.start(_create_grid.bind())
+
+
+func _create_grid():
+  var cell_numbers = SudokuUtil.create_filled_grid(_random)
+  call_deferred("emit_signal", "grid_filled")
+  var remove_pos = []
+  # FIXME: soooooo inefficient.
+  for i in range(_cells.size()):
+    var pos
+    while true:
+      pos = _random.randi_range(0, 80)
+      if pos not in remove_pos:
+        remove_pos.append(pos)
+        break
+
+  for index in remove_pos:
+    var num = cell_numbers[index]
+    cell_numbers[index] = 0
+    if SudokuUtil.backtrack_cell(cell_numbers, 0, 0) > 1:
+      cell_numbers[index] = num
+      break
+  call_deferred("emit_signal", "cells_removed")
+  call_deferred("emit_signal", "grid_created")
+  call_deferred("set_cell_numbers", cell_numbers)
+
+  #grid_created.emit()
 
 
 # return true if the grid has only one solution, otherwise return false.
@@ -193,6 +221,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _ready() -> void:
+  _thread = Thread.new()
   for j in range(9):
     for i in range(9):
       var cell = _cells[j * 9 + i]
@@ -226,3 +255,8 @@ func _init() -> void:
       $BoxHolder.add_child(box_border)
       _boxes.append(box_border)
       _adjust_box_properties(j, i)
+
+
+func _exit_tree() -> void:
+  if _thread.is_started():
+    _thread.wait_to_finish()
