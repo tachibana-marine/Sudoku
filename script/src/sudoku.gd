@@ -4,7 +4,6 @@ extends Node2D
 
 signal cell_edited
 signal grid_filled
-signal cells_removed
 signal grid_created
 
 @export var default_cell_color: Color = Color.WHITE
@@ -113,33 +112,6 @@ func reset_cells():
     cell.number = 0
 
 
-# Remove as much cells as possible, while making sure there's only one solution
-# emits cells_removed
-func reset_as_much_as_possible_with_unique_solutions():
-  var remove_pos = []
-  var cell_numbers: Array[int] = get_cell_numbers()
-  # FIXME: soooooo inefficient.
-  for i in range(_cells.size()):
-    var pos
-    while true:
-      pos = _random.randi_range(0, 80)
-      if pos not in remove_pos:
-        remove_pos.append(pos)
-        break
-
-  for index in remove_pos:
-    var num = cell_numbers[index]
-    cell_numbers[index] = 0
-    if SudokuUtil.backtrack_cell(cell_numbers, 0, 0) > 1:
-      cell_numbers[index] = num
-      break
-
-  for index in range(cell_numbers.size()):
-    _cells[index].number = cell_numbers[index]
-
-  cells_removed.emit()
-
-
 # make non zero cells immutable
 # other cells become mutable
 func make_non_zero_cells_immutable():
@@ -173,11 +145,8 @@ func _create_grid():
     if SudokuUtil.backtrack_cell(cell_numbers, 0, 0) > 1:
       cell_numbers[index] = num
       break
-  call_deferred("emit_signal", "cells_removed")
   call_deferred("emit_signal", "grid_created")
   call_deferred("set_cell_numbers", cell_numbers)
-
-  #grid_created.emit()
 
 
 # return true if the grid has only one solution, otherwise return false.

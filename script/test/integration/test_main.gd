@@ -15,8 +15,10 @@ func test_complete_game():
   # progress window is visible
   var progress = main.get_node("Progress")
   assert_true(progress.is_visible())
+  assert_eq(progress.progress_text, Progress.STATUS_FILLING)
+  await sudoku.grid_filled
+  assert_eq(progress.progress_text, Progress.STATUS_REMOVING)
   await sudoku.grid_created
-  # waiting a few frames for the visibility to change
   wait_frames(10)
   # progress window is hidden after the grid is ready
   assert_false(progress.is_visible())

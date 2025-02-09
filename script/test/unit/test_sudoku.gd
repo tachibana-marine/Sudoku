@@ -103,23 +103,6 @@ func test_create_grid():
   sudoku.create_grid()
   await sudoku.grid_created
   assert_signal_emitted(sudoku, "grid_filled")
-  assert_signal_emitted(sudoku, "cells_removed")
-
-
-func test_reset_as_much_as_possible_with_unique_solutions():
-  var sudoku = add_child_autoqfree(Sudoku.new())
-  watch_signals(sudoku)
-  sudoku.set_cell_numbers(SudokuUtilTest.filled_grid)
-  sudoku.set_state(200)
-  sudoku.reset_as_much_as_possible_with_unique_solutions()
-  var cells = sudoku.get_cell_numbers()
-  var zero_count = 0
-  for cell in cells:
-    if cell == 0:
-      zero_count += 1
-  assert_ne(zero_count, 0)
-  assert_eq(SudokuUtil.backtrack_cell(cells, 0, 0), 1)
-  # assert_signal_emitted(sudoku, "cells_removed")
 
 
 func test_change_cell_number():
