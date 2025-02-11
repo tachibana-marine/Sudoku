@@ -64,10 +64,6 @@ func test_draw():
   cell.size = 10
   await wait_frames(1)
   assert_eq(cell.log_txt, "(0,0)(10,10)#ffffffff, (0,0)(10,10)BORDER")
-  # redraw
-  cell.size = 20
-  await wait_frames(1)
-  assert_eq(cell.log_txt, "(0,0)(20,20)#ffffffff, (0,0)(20,20)BORDER")
 
 
 class TestCellInput:

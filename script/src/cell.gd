@@ -9,14 +9,12 @@ signal on_click
     return size
   set(value):
     size = value
-    queue_redraw()
 
 @export var border_width: int = 1:
   get():
     return border_width
   set(value):
     border_width = value
-    queue_redraw()
 
 @export var font_size: int = 16:
   get():
@@ -58,7 +56,6 @@ var color: Color = Color.WHITE:
       return
     if value >= 0 and value <= 9:
       number = value
-      queue_redraw()
       if value != 0:
         $Label.text = str(value)
       else:
@@ -78,7 +75,6 @@ func _input_event(_viewport: Viewport, event: InputEvent, _shape_idx: int) -> vo
   if event is InputEventMouseButton:
     if event.button_index == MOUSE_BUTTON_LEFT && event.is_pressed():
       on_click.emit(self)
-      queue_redraw()
 
 
 func _ready() -> void:

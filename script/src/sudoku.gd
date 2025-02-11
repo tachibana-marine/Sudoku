@@ -198,37 +198,28 @@ func _ready() -> void:
     _thread = Thread.new()
   for j in range(9):
     for i in range(9):
-      var cell = _cells[j * 9 + i]
-      if not cell.is_inside_tree():
-        await cell.ready
+      var cell = _cell_scene.instantiate()
+      add_child(cell)
+      _cells.append(cell)
       cell.number = 0
       cell.on_click.connect(_on_click_cell)
       _adjust_cell_properties(i, j)
 
-
-func _init() -> void:
-  _random.randomize()
-  var cell_holder = Node2D.new()
-  cell_holder.name = "CellHolder"
-  add_child(cell_holder)
-
-  var box_holder = Node2D.new()
-  box_holder.name = "BoxHolder"
-  add_child(box_holder)
-
-  for j in range(9):
-    for i in range(9):
-      var cell = _cell_scene.instantiate()
-      $CellHolder.add_child(cell)
-      _cells.append(cell)
-
   for i in range(3):
     for j in range(3):
       var box_border = Border.new()
+      add_child(box_border)
       box_border.border_width = 7
-      $BoxHolder.add_child(box_border)
       _boxes.append(box_border)
       _adjust_box_properties(j, i)
+
+
+func _enter_tree() -> void:
+  pass
+
+
+func _init() -> void:
+  _random.randomize()
 
 
 func _exit_tree() -> void:

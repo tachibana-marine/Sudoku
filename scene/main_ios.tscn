@@ -35,4 +35,22 @@ text = "Clear!
 Reload window
 to replay"
 
+[node name="Panel2" type="Panel" parent="."]
+offset_left = 728.0
+offset_top = 468.0
+offset_right = 768.0
+offset_bottom = 508.0
+
+[node name="Panel4" type="Panel" parent="."]
+offset_left = 624.0
+offset_top = 328.0
+offset_right = 664.0
+offset_bottom = 368.0
+
+[node name="Panel" type="Panel" parent="."]
+offset_left = 651.0
+offset_top = 203.0
+offset_right = 691.0
+offset_bottom = 243.0
+
 [connection signal="cell_edited" from="Sudoku" to="." method="_on_sudoku_cell_edited"]
