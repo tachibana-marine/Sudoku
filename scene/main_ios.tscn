@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://bkat0jmn1td8"]
+
+[ext_resource type="Script" path="res://script/src/main_ios.gd" id="1_jucpi"]
+[ext_resource type="Script" path="res://script/src/sudoku.gd" id="1_y0ohs"]
+
+[node name="MainIos" type="Node2D"]
+script = ExtResource("1_jucpi")
+
+[node name="Version" type="Label" parent="."]
+offset_left = 126.0
+offset_top = -3.0
+offset_right = 166.0
+offset_bottom = 20.0
+text = "ver"
+metadata/_edit_use_anchors_ = true
+
+[node name="Sudoku" type="Node2D" parent="."]
+position = Vector2(36, 45)
+script = ExtResource("1_y0ohs")
+is_thread_available = false
+
+[node name="ClearWindow" type="Node2D" parent="."]
+visible = false
+
+[node name="Label" type="Label" parent="ClearWindow"]
+offset_left = 270.0
+offset_top = 242.0
+offset_right = 464.0
+offset_bottom = 338.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 70
+text = "Clear!
+
+Reload window
+to replay"
+
+[connection signal="cell_edited" from="Sudoku" to="." method="_on_sudoku_cell_edited"]

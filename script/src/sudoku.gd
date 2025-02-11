@@ -6,6 +6,7 @@ signal cell_edited
 signal grid_filled
 signal grid_created
 
+@export var is_thread_available: bool = true
 @export var default_cell_color: Color = Color.WHITE
 @export var selected_cell_color: Color = Color.ORANGE
 
@@ -123,7 +124,10 @@ func make_non_zero_cells_immutable():
 
 
 func create_grid():
-  _thread.start(_create_grid.bind())
+  if is_thread_available:
+    _thread.start(_create_grid.bind())
+  else:
+    _create_grid()
 
 
 func _create_grid():
@@ -190,7 +194,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _ready() -> void:
-  _thread = Thread.new()
+  if is_thread_available:
+    _thread = Thread.new()
   for j in range(9):
     for i in range(9):
       var cell = _cells[j * 9 + i]
@@ -227,5 +232,5 @@ func _init() -> void:
 
 
 func _exit_tree() -> void:
-  if _thread.is_started():
+  if is_thread_available and _thread.is_started():
     _thread.wait_to_finish()
